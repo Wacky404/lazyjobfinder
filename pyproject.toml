@@ -1,0 +1,11 @@
+[project]
+name = "lazyjobfinder"
+version = "0.1.0"
+description = "Let lazyjobfinder take the weight off your shoulders when loooking for your next role."
+readme = "README.md"
+requires-python = ">=3.13"
+dependencies = [
+    "geopy>=2.4.1",
+    "openai>=1.72.0",
+    "python-dotenv>=1.1.0",
+]
