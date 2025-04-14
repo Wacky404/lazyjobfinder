@@ -28,8 +28,8 @@ class Prompts():
         >
         > Return output in the following format:
         >
-        > **Score**: `X.XX`
-        > **Justification**:
+        > Score: `X.XX`
+        > Justification:
         > - Bullet point 1
         > - Bullet point 2
         > - Bullet point 3
@@ -71,8 +71,8 @@ class Prompts():
         >
         > Return your answer in this format:
         >
-        > **Score**: `X.XX`
-        > **Justification**:
+        > Score: `X.XX`
+        > Justification:
         > - Bullet point 1
         > - Bullet point 2
         > - Bullet point 3
@@ -114,8 +114,8 @@ class Prompts():
         >
         > Return your response in this format:
         >
-        > **Score**: `X.XX`
-        > **Justification**:
+        > Score: `X.XX`
+        > Justification:
         > - Bullet point 1
         > - Bullet point 2
         > - Bullet point 3

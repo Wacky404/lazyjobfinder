@@ -1,5 +1,5 @@
 from src.resume import Resume
-from src.utils.logger import setup_logging
+from src.utils.logger import setup_logging, logger
 import unittest
 import os
 
@@ -15,19 +15,27 @@ S = '''This is a short example summary.'''
 WE = '''5 Years experince in IT Service Desk Postion.'''
 LINKS = {'linkedin': 'https://linkedin.com/user'}
 SKILLS = {'Python': '3 years experience', 'Cpp': '4 years experience'}
-EDU = [{'Highscool Name': 'Some Achievements'},
-       {'College', 'Degree and stuff'}]
-P = {'cool thing': 'info on cool thing'}
+EDU = [
+    {'Generic High School': 'Graduated with Honers. Seal for intro to IT.'},
+    {'University of State': 'BS. Information Technology Minor in Applied Math'}
+]
+P = {
+    'IT Asset Software': 'Local first IT software that can track IT assets and other information with sync to cloud, if wanted',
+    'Stock Tracking': 'Built with CPP. This program allowed for quick integration of real-time stock information for applications.'
+}
 
 # Faux pulled data from Job Description
 JOB_LOC = '3923 S University Ave, Little Rock, AR 72204'
 REQ_SKILLS = ['Python', 'Ruby', 'Cpp']
 REQ_WRK_EXP = """3 Years experience in IT Help Desk position."""
+REQ_EDU = "BS. Computer Science or equivalent field, if no degree consumerate work experience can suffice."
+JOB_POSITION = "Junior Developer"
 
 
 class TestResume(unittest.TestCase):
 
-    def setUp(self):
+    @classmethod
+    def setUpClass(self):
         self.T = Resume(firstName=F, middleName=M, lastName=L,
                         location=LOC, travelDistance=TD, email=E,
                         summary=S, workExp=WE, links=LINKS, skills=SKILLS,
@@ -54,6 +62,27 @@ class TestResume(unittest.TestCase):
         self.assertIs(type(s), float)
         self.assertLessEqual(s, 1)
         self.assertGreaterEqual(s, 0)
+
+    def test_compareEdu(self):
+        s = self.T.compareEdu(req_edu=REQ_EDU)
+        self.assertIs(type(s), float)
+        self.assertLessEqual(s, 1)
+        self.assertGreaterEqual(s, 0)
+
+    def test_prjacc(self):
+        s = self.T.prjacc(job_position=JOB_POSITION)
+        self.assertIs(type(s), float)
+        self.assertLessEqual(s, 1)
+        self.assertGreaterEqual(s, 0)
+
+    @classmethod
+    def tearDownClass(self):
+        s = self.T.score()
+        # self.assertIs(type(s), float)
+        # for k, v, in self.T.scores.items():
+        #     self.assertIs(type(k), str)
+        #     self.assertIs(type(v), float)
+        logger.info(f"Testing of Resume score results:\n{self.T.scores}")
 
 
 if __name__ == '__main__':

@@ -157,6 +157,7 @@ class Resume:
             logger.debug(structured_response)
 
             if is_float(structured_response['score']):
+                self.scores['experience'] = float(structured_response['score'])
                 return float(structured_response['score'])
 
         except Exception as e:
@@ -178,22 +179,35 @@ class Resume:
         Returns:
             similarity score between 0 and 1 of comparison (float)
         """
+        edu_str: str = ""
+        for idx, edu_info in enumerate(self.education):
+
+            # expecting key to be education name; like College Name and value to be description
+            for key, val in edu_info.items():
+                edu_str += f"{key}: {val}\n"
+
+        req_edu_fmted: str = ""
+        if isinstance(req_edu, list):
+            for line in req_edu:
+                req_edu_fmted += (line + " ")
+
         try:
             response = ai_cmp(prompt=PROMPTS.prompt_cmp_edu(
-                user_edu_fmted=self.education, job_desc_edu_fmted=req_edu))
+                user_edu_fmted=edu_str, job_desc_edu_fmted=req_edu if isinstance(req_edu, str) else req_edu_fmted))
             logger.debug(response)
             structured_response: dict[str, str] = parseStructuredResponse(
                 response=str(response))
             logger.debug(structured_response)
 
             if is_float(structured_response['score']):
+                self.scores['education'] = float(structured_response['score'])
                 return float(structured_response['score'])
 
         except Exception as e:
             logger.exception(
                 f"An exception of type {type(e).__name__} occurred. Details: {str(e)}")
             logger.debug(
-                f'API call to compare {self.workExp} to {rec_exp} errored.')
+                f'API call to compare {self.education} to {req_edu} errored.')
             return None
 
         return None
@@ -208,7 +222,32 @@ class Resume:
         Returns:
             similarity score of projects compared to job title/position (float)
         """
-        pass
+        prj_fmted: str = ""
+        for key, val in self.projects.items():
+            # expecting key to be proj name and val description
+            prj_fmted += f"{key}: {val}\n"
+
+        try:
+            response = ai_cmp(prompt=PROMPTS.prompt_cmp_prj_acc(
+                user_prjs_fmted=prj_fmted, job_title=job_position))
+            logger.debug(response)
+            structured_response: dict[str, str] = parseStructuredResponse(
+                response=str(response))
+            logger.debug(structured_response)
+
+            if is_float(structured_response['score']):
+                self.scores['projectAccuracy'] = float(
+                    structured_response['score'])
+                return float(structured_response['score'])
+
+        except Exception as e:
+            logger.exception(
+                f"An exception of type {type(e).__name__} occurred. Details: {str(e)}")
+            logger.debug(
+                f'API call to compare {self.projects} to {job_position} errored.')
+            return None
+
+        return None
 
     def score(self) -> float:
         """
@@ -221,9 +260,9 @@ class Resume:
         for key, val in self.scores.items():
             if val is not None:
                 score += (val * self.weights[key])
-            else:
-                logger.warn(
-                    f"There was score not calculated before final scoring!\n{self._ctx}")
+            elif key != 'overall':
+                logger.warning(
+                    f"{key} score not calculated before final scoring!\n{self._ctx}")
 
         self.scores['overall'] = score
         logger.info(f"Overall score has been calculated at {score}")
