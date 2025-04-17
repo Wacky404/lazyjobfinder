@@ -5,7 +5,11 @@ from typing import Optional
 import os
 
 load_dotenv()
-CLIENT = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
+CLIENT = OpenAI(
+    api_key=os.getenv("OPENAI_API_KEY"),
+    # if you are using LITEllM for proxy server: https://docs.litellm.ai/docs/proxy/user_keys
+    # base_url=os.getenv("BASE_URL")
+)
 logger.debug(f"Client has been iniated.")
 
 

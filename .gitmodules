@@ -1,0 +1,3 @@
+[submodule "litellm-lazyjobfinder"]
+	path = litellm-lazyjobfinder
+	url = git@github.com:Wacky404/litellm-lazyjobfinder.git
