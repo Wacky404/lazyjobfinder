@@ -1,4 +1,3 @@
-# TODO: finish up last compares for AI to score
 from typing import Optional, Set, Union, Dict, List, Tuple
 from dataclasses import dataclass, field
 from geopy.geocoders import Nominatim
@@ -25,7 +24,7 @@ PROMPTS: Prompts = Prompts()
 
 @dataclass
 class Resume:
-    """ Class to hold Resume data and calculate scores. """
+    """ Data class to hold Resume data and calculate scores. """
 
     firstName: str
     middleName: Optional[str]

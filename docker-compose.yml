@@ -1,0 +1,91 @@
+services:
+  lazyjobfinder:
+    build:
+      context: .
+      args:
+        target: runtime
+    image: lazyjobfinder:latest # Need to create a image for my project; not sure how to yet.
+    ports:
+      - "4080:4080" # Map the container port to the host, change the host port if necessary
+    environment:
+        DATABASE_URL: "postgresql://lzyjf:dbpassword404@db:6000/lazyjobfinder"
+        STORE_MODEL_IN_DB: "True" # allows adding models via UI
+    env_file:
+      - .env # Load local .env file
+    depends_on:
+      - db  # Indicates that this service depends on the 'db' service, ensuring 'db' starts first
+  db:
+    image: postgres:16
+    container_name: lzyjf_postgres
+    restart: always
+    environment:
+      POSTGRES_DB: lazyjobfinder
+      POSTGRES_USER: lzyjf
+      POSTGRES_PASSWORD: dbpassword404
+    ports:
+      - "6000:6000"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data  # Persists Postgres data across container restarts
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -d lazyjobfinder -U dbpassword404"]
+      interval: 1s
+      timeout: 5s
+      retries: 10
+
+  prometheus:
+    image: prom/prometheus
+    volumes:
+      - prometheus_data:/prometheus
+      - ./prometheus.yml:/etc/prometheus/prometheus.yml
+    ports:
+      - "9191:9191"
+    command:
+      - '--config.file=/etc/prometheus/prometheus.yml'
+      - '--storage.tsdb.path=/prometheus'
+      - '--storage.tsdb.retention.time=15d'
+    depends_on:
+      - alertmanager
+    restart: always
+
+  loki:
+    image: grafana/loki:2.9.1
+    container_name: loki
+    ports:
+      - "3100:3100"
+    command: -config.file=/etc/loki/local-config.yaml
+
+  promtail:
+    image: grafana/promtail:2.9.1
+    container_name: promtail
+    volumes:
+      - ./promtail-config.yml:/etc/promtail/config.yml
+      - ./logs:/hostlogs
+    command: -config.file=/etc/promtail/config.yml
+
+  alertmanager:
+    image: prom/alertmanager:v0.26.0
+    container_name: alertmanager
+    ports:
+      - "9093:9093"
+    volumes:
+      - ./alertmanager.yml:/etc/alertmanager/config.yml
+
+  grafana:
+    image: grafana/grafana:10.2.3
+    container_name: grafana
+    ports:
+      - "3000:3000"
+    environment:
+      - GF_SECURITY_ADMIN_PASSWORD=admin
+    depends_on:
+      - prometheus
+      - loki
+    volumes:
+      - grafana-storage:/var/lib/grafana
+
+volumes:
+  prometheus_data:
+    driver: local
+  postgres_data:
+    name: lazyjobfinder_postgres_data  # Named volume for Postgres data persistence
+  grafana-storage:
