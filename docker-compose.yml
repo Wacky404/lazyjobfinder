@@ -8,7 +8,7 @@ services:
     ports:
       - "4080:4080" # Map the container port to the host, change the host port if necessary
     environment:
-        DATABASE_URL: "postgresql://lzyjf:dbpassword404@db:6000/lazyjobfinder"
+        DATABASE_URL: postgresql://lzyjf:dbpassword404@db:5432/lazyjobfinder
         STORE_MODEL_IN_DB: "True" # allows adding models via UI
     env_file:
       - .env # Load local .env file
@@ -23,11 +23,11 @@ services:
       POSTGRES_USER: lzyjf
       POSTGRES_PASSWORD: dbpassword404
     ports:
-      - "6000:6000"
+      - "6000:5432"
     volumes:
       - postgres_data:/var/lib/postgresql/data  # Persists Postgres data across container restarts
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -d lazyjobfinder -U dbpassword404"]
+      test: ["CMD-SHELL", "pg_isready -d lazyjobfinder -U lzyjf"]
       interval: 1s
       timeout: 5s
       retries: 10
@@ -38,7 +38,7 @@ services:
       - prometheus_data:/prometheus
       - ./prometheus.yml:/etc/prometheus/prometheus.yml
     ports:
-      - "9191:9191"
+      - "9191:9090"
     command:
       - '--config.file=/etc/prometheus/prometheus.yml'
       - '--storage.tsdb.path=/prometheus'

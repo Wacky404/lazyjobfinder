@@ -12,7 +12,7 @@ rule_files:
 scrape_configs:
   - job_name: 'lazyjobfinder'
     static_configs:
-      - targets: ['lazyjobfinder:4000']  # Assuming lazyjobfinder exposes metrics at port 4000
+      - targets: ['localhost:4000']  # Assuming lazyjobfinder exposes metrics at port 4000
   - job_name: prometheus
     static_configs:
       - targets: ["localhost:9090"]
